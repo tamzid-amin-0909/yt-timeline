@@ -1,0 +1,586 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>Recharge Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+    body {
+      font-family: "Inter", sans-serif;
+    }
+    /* Hide default radio */
+    input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    /* Custom radio style for recharge options */
+    label > input[type="radio"] {
+      position: relative;
+      opacity: 1;
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.4rem;
+      flex-shrink: 0;
+      cursor: pointer;
+      appearance: none;
+      border: 2px solid #d6d8e7;
+      border-radius: 0.375rem;
+      background-color: transparent;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+    label > input[type="radio"]:checked {
+      border-color: #a7f3d0; /* light green */
+      background-color: #a7f3d0;
+    }
+    /* For payment method labels, remove radio circle and use outline and background on selection */
+    label.payment-label {
+      position: relative;
+      cursor: pointer;
+      border: 1px solid #d6d8e7;
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      max-width: 140px;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1a1a2e;
+      user-select: none;
+      transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    }
+    label.payment-label input[type="radio"] {
+      display: none;
+    }
+    label.payment-label:hover {
+      border-color: #1f7a6c;
+      color: #1f7a6c;
+    }
+    label.payment-label input[type="radio"]:checked + span {
+      border: 2px solid #a7f3d0;
+      background-color: #a7f3d0;
+      color: #1f7a6c;
+      border-radius: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    /* Bigger recharge boxes */
+    form.recharge-form label {
+      min-height: 3.5rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+    /* Smaller price text */
+    form.recharge-form span.price {
+      font-size: 0.65rem;
+    }
+    /* Center success message vertically and horizontally */
+    #success-message {
+      position: fixed;
+      inset: 0;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #eef0fa;
+      z-index: 50;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    /* Styled transaction input container */
+    #transaction-container {
+      margin-top: 1rem;
+      text-align: left;
+    }
+    #transaction-container label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #1a1a2e;
+      margin-bottom: 0.5rem;
+    }
+    #transactionId {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1.5px solid #d6d8e7;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    #transactionId:focus {
+      outline: none;
+      border-color: #1f7a6c;
+      box-shadow: 0 0 6px #a7f3d0;
+    }
+    #final-submit-btn {
+      margin-top: 1rem;
+      background-color: #1f7a6c;
+      color: white;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0;
+      width: 100%;
+      max-width: 320px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #final-submit-btn:hover {
+      background-color: #16614f;
+    }
+  </style>
+</head>
+<body class="bg-[#eef0fa] min-h-screen p-3 sm:p-4 md:p-6">
+  <main class="max-w-md mx-auto space-y-4 text-xs sm:text-sm">
+    <div id="form-container">
+      <!-- Account Info Section -->
+      <section class="bg-white rounded-lg border border-[#d6d8e7]">
+        <header
+          class="flex items-center gap-2 border-b border-[#d6d8e7] px-3 py-2 rounded-t-lg select-none"
+        >
+          <div
+            class="flex items-center justify-center w-6 h-6 rounded-full bg-[#1f7a6c] text-white font-semibold text-xs sm:text-sm"
+          >
+            I
+          </div>
+          <h2
+            class="text-[#1f7a6c] font-semibold text-sm sm:text-base leading-5 sm:leading-6"
+          >
+            Account Info
+          </h2>
+        </header>
+        <form class="p-3 space-y-3" id="account-form" onsubmit="return false">
+          <div>
+            <label
+              class="block text-[#1a1a2e] font-semibold mb-1 text-xs sm:text-sm"
+              for="playerId"
+              >Player Id</label
+            >
+            <input
+              class="w-full border border-[#d6d8e7] rounded-xl py-1.5 px-3 placeholder:text-[#a3a3c2] placeholder:text-xs sm:placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-[#1f7a6c] text-xs sm:text-sm"
+              id="playerId"
+              placeholder="Enter player id"
+              type="text"
+              required
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[#1a1a2e] font-semibold mb-1 text-xs sm:text-sm"
+              for="email"
+              >Email</label
+            >
+            <input
+              class="w-full border border-[#d6d8e7] rounded-xl py-1.5 px-3 placeholder:text-[#a3a3c2] placeholder:text-xs sm:placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-[#1f7a6c] text-xs sm:text-sm"
+              id="email"
+              placeholder="Enter email"
+              type="email"
+              required
+            />
+          </div>
+        </form>
+      </section>
+      <!-- Select Recharge Section -->
+      <section class="bg-white rounded-lg border border-[#d6d8e7]">
+        <header
+          class="flex items-center gap-2 border-b border-[#d6d8e7] px-3 py-2 rounded-t-lg select-none"
+        >
+          <div
+            class="flex items-center justify-center w-6 h-6 rounded-full bg-[#1f7a6c] text-white font-semibold text-xs sm:text-sm"
+          >
+            R
+          </div>
+          <h2
+            class="text-[#1f7a6c] font-semibold text-sm sm:text-base leading-5 sm:leading-6"
+          >
+            Select Recharge
+          </h2>
+        </header>
+        <form class="p-3 grid grid-cols-2 gap-1.5 recharge-form" id="recharge-form" onsubmit="return false">
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="25 Diamond"
+              data-price="25"
+              aria-label="25 Diamond"
+              required
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >25 Diamond</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 25</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="50 Diamond"
+              data-price="40"
+              aria-label="50 Diamond"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >50 Diamond</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 40</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="115 Diamond"
+              data-price="82"
+              aria-label="115 Diamond"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >115 Diamond</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 82</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="240 Diamond"
+              data-price="165"
+              aria-label="240 Diamond"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >240 Diamond</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 165</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="610 Diamond"
+              data-price="420"
+              aria-label="610 Diamond"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >610 Diamond</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 420</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="1240 Diamond"
+              data-price="830"
+              aria-label="1240 Diamond"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >1240 Diamond</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 830</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="2530 Diamond"
+              data-price="1655"
+              aria-label="2530 Diamond"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >2530 Diamond</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 1655</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="Weekly"
+              data-price="161"
+              aria-label="Weekly"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >Weekly</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 161</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="Monthly"
+              data-price="810"
+              aria-label="Monthly"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >Monthly</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 810</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="Level Up Pass"
+              data-price="165"
+              aria-label="Level Up Pass"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >Level Up Pass</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 165</span
+            >
+          </label>
+          <label
+            class="border border-[#d6d8e7] rounded-lg flex items-center cursor-pointer col-span-2 max-w-[12rem] mx-auto hover:bg-[#f9fafc] select-none"
+          >
+            <input
+              name="recharge"
+              type="radio"
+              value="Weekly Lite"
+              data-price="47"
+              aria-label="Weekly Lite"
+            />
+            <span class="font-semibold text-[#1a1a2e] whitespace-nowrap text-xs sm:text-sm"
+              >Weekly Lite</span
+            >
+            <span
+              class="price text-[#1f7a6c] font-normal ml-auto whitespace-nowrap text-[0.55rem] sm:text-xs"
+              >৳ 47</span
+            >
+          </label>
+        </form>
+      </section>
+      <!-- Select Payment Section -->
+      <section class="bg-white rounded-lg border border-[#d6d8e7]">
+        <header
+          class="flex items-center gap-2 border-b border-[#d6d8e7] px-3 py-2 rounded-t-lg select-none"
+        >
+          <div
+            class="flex items-center justify-center w-6 h-6 rounded-full bg-[#1f7a6c] text-white font-semibold text-xs sm:text-sm"
+          >
+            P
+          </div>
+          <h2
+            class="text-[#1f7a6c] font-semibold text-sm sm:text-base leading-5 sm:leading-6"
+          >
+            Select Payment
+          </h2>
+        </header>
+        <form class="p-3 flex flex-col gap-3" id="payment-form" onsubmit="return false">
+          <div class="flex gap-2 flex-wrap justify-center">
+            <label class="payment-label" for="payment-auto">
+              <input
+                id="payment-auto"
+                name="payment"
+                type="radio"
+                value="Auto Payment"
+                checked
+                aria-label="Auto Payment"
+                required
+              />
+              <span>Auto Payment</span>
+            </label>
+            <label class="payment-label" for="payment-pipo">
+              <input
+                id="payment-pipo"
+                name="payment"
+                type="radio"
+                value="PiPO BaZaR"
+                aria-label="PiPO BaZaR"
+              />
+              <span>PiPO BaZaR</span>
+            </label>
+          </div>
+          <button
+            type="submit"
+            id="submit-btn"
+            class="bg-[#1f7a6c] text-white font-semibold rounded-lg py-2 w-full max-w-xs mx-auto hover:bg-[#16614f] transition-colors"
+          >
+            Submit
+          </button>
+        </form>
+      </section>
+      <!-- How to Recharge Section -->
+      <section class="bg-white rounded-lg border border-[#d6d8e7] p-4">
+        <h3 class="text-[#1f7a6c] font-semibold text-base mb-3 select-none">
+          How to Recharge
+        </h3>
+        <ol class="list-decimal list-inside space-y-2 text-[#1a1a2e] text-xs sm:text-sm">
+          <li>Enter your Player Id and Email in the Account Info section.</li>
+          <li>Select your desired recharge option from the Select Recharge section.</li>
+          <li>Choose a payment method in the Select Payment section.</li>
+          <li>Click the Submit button to proceed with the recharge.</li>
+          <li>Follow the on-screen instructions to complete your payment.</li>
+        </ol>
+      </section>
+    </div>
+    <section id="confirmation" class="hidden bg-white rounded-lg border border-[#d6d8e7] p-5 text-center text-[#1a1a2e] text-sm space-y-3">
+      <h2 class="text-[#1f7a6c] font-semibold text-lg">Confirm Your Recharge</h2>
+      <p><strong>Player Id:</strong> <span id="conf-playerId"></span></p>
+      <p><strong>Email:</strong> <span id="conf-email"></span></p>
+      <p><strong>Recharge:</strong> <span id="conf-recharge"></span></p>
+      <p><strong>Payment Method:</strong> <span id="conf-payment"></span></p>
+      <p class="mt-4 font-semibold text-[#16614f]">Pay <span id="conf-price">1000</span> Tk to this number: <span id="mobile-number">01700000000</span></p>
+      <div id="transaction-container">
+        <label for="transactionId">Please enter your payment transaction ID below to complete your order</label>
+        <input type="text" id="transactionId" placeholder="Enter transaction ID" />
+        <button id="final-submit-btn">Submit</button>
+      </div>
+    </section>
+    <section id="success-message" class="hidden bg-white rounded-lg border border-[#d6d8e7] p-5 text-center text-[#16614f] text-lg font-semibold space-y-3">
+      <p>🎉 Congratulations! Your order has been successfully placed.</p>
+      <button id="back-home-btn" class="mt-4 bg-[#1f7a6c] text-white font-semibold rounded-lg py-2 px-6 hover:bg-[#16614f] transition-colors">
+        Back to Home
+      </button>
+    </section>
+  </main>
+  <script>
+    const submitBtn = document.getElementById('submit-btn');
+    const formContainer = document.getElementById('form-container');
+    const confirmation = document.getElementById('confirmation');
+    const successMessage = document.getElementById('success-message');
+    const finalSubmitBtn = document.getElementById('final-submit-btn');
+    const backHomeBtn = document.getElementById('back-home-btn');
+    const confPriceSpan = document.getElementById('conf-price');
+
+    submitBtn.addEventListener('click', () => {
+      // Get values
+      const playerId = document.getElementById('playerId').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      const rechargeRadios = document.querySelectorAll('input[name="recharge"]');
+      let rechargeValue = null;
+      let rechargePrice = null;
+      for (const r of rechargeRadios) {
+        if (r.checked) {
+          rechargeValue = r.value;
+          rechargePrice = r.getAttribute('data-price') || '1000';
+          break;
+        }
+      }
+
+      const paymentRadios = document.querySelectorAll('input[name="payment"]');
+      let paymentValue = null;
+      for (const p of paymentRadios) {
+        if (p.checked) {
+          paymentValue = p.value;
+          break;
+        }
+      }
+
+      // Simple validation
+      if (!playerId) {
+        alert('Please enter Player Id.');
+        return;
+      }
+      if (!email) {
+        alert('Please enter Email.');
+        return;
+      }
+      if (!rechargeValue) {
+        alert('Please select a Recharge option.');
+        return;
+      }
+      if (!paymentValue) {
+        alert('Please select a Payment method.');
+        return;
+      }
+
+      // Hide form container and show confirmation
+      formContainer.classList.add('hidden');
+      confirmation.classList.remove('hidden');
+
+      // Set confirmation values
+      document.getElementById('conf-playerId').textContent = playerId;
+      document.getElementById('conf-email').textContent = email;
+      document.getElementById('conf-recharge').textContent = rechargeValue;
+      document.getElementById('conf-payment').textContent = paymentValue;
+      confPriceSpan.textContent = rechargePrice;
+    });
+
+    finalSubmitBtn.addEventListener('click', () => {
+      const transactionId = document.getElementById('transactionId').value.trim();
+      if (!transactionId) {
+        alert('Please enter the transaction ID.');
+        return;
+      }
+      // Hide confirmation and show success message
+      confirmation.classList.add('hidden');
+      successMessage.classList.remove('hidden');
+      successMessage.classList.add('flex');
+    });
+
+    backHomeBtn.addEventListener('click', () => {
+      // Reset all forms and views
+      document.getElementById('playerId').value = '';
+      document.getElementById('email').value = '';
+      const rechargeRadios = document.querySelectorAll('input[name="recharge"]');
+      rechargeRadios.forEach(r => r.checked = false);
+      const paymentRadios = document.querySelectorAll('input[name="payment"]');
+      paymentRadios.forEach(p => p.checked = false);
+      document.getElementById('transactionId').value = '';
+
+      successMessage.classList.add('hidden');
+      successMessage.classList.remove('flex');
+      formContainer.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
